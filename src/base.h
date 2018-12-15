@@ -2,19 +2,11 @@
 // Created by morfeush22 on 15.12.18.
 //
 
-#ifndef PROJEKT_BASE_H
-#define PROJEKT_BASE_H
+#ifndef CHEBYSHEV_BASE_H
+#define CHEBYSHEV_BASE_H
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#define ASSERT_EQUAL(x, y)              \
-{                                       \
-    if ( (x) != (y) )                   \
-    {                                   \
-        exit(EXIT_FAILURE);             \
-    }                                   \
-}
 
 struct Data {
     double ** matrix;
@@ -52,6 +44,14 @@ struct Data allocateData(int dimension) {
     data.dimension = dimension;
 
     return data;
+}
+
+void deallocateData(struct Data data) {
+    for (int i = 0; i < data.dimension; ++i)
+        free(data.matrix[i]);
+
+    free(data.matrix);
+    free(data.bVector);
 }
 
 void readData(FILE * fp, struct Data data) {
@@ -108,4 +108,4 @@ struct Data loadDataFromFile(const char * path) {
     return data;
 }
 
-#endif //PROJEKT_BASE_H
+#endif //CHEBYSHEV_BASE_H
