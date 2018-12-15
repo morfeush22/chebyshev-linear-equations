@@ -10,6 +10,6 @@ void basicTest() {
     printData(data);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
     basicTest();
 }

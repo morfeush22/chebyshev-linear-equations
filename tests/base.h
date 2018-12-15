@@ -28,6 +28,7 @@ int numberOfLines(FILE * fp) {
 
     while(!feof(fp)) {
         ch = fgetc(fp);
+
         if (ch == '\n')
             lines++;
     }
@@ -70,7 +71,9 @@ void readData(FILE * fp, struct Data data) {
 
 struct Data parseData(FILE * fp, int dimension) {
     struct Data data = allocateData(dimension);
+
     readData(fp, data);
+
     return data;
 }
 
