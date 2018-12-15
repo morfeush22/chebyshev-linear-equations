@@ -6,6 +6,8 @@
 
 void basicTest() {
     ASSERT_EQUAL(1, 1);
+    struct Data data = loadDataFromFile("sources/simple_eq");
+    printData(data);
 }
 
 int main(int argc, char** argv) {
