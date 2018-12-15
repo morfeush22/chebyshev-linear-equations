@@ -12,7 +12,7 @@
 {                                       \
     if ( (x) != (y) )                   \
     {                                   \
-        exit(1);                        \
+        exit(EXIT_FAILURE);             \
     }                                   \
 }
 
