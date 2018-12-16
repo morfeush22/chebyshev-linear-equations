@@ -6,7 +6,7 @@
 #include "../src/base.h"
 
 void basicTest() {
-    ASSERT_EQUAL(1, 1);
+    ASSERT_EQUAL(1.0, 2.0);
     struct Data data = loadDataFromFile("sources/simple_eq");
     printData(data);
     deallocateData(data);
