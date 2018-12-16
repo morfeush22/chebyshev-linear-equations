@@ -35,7 +35,9 @@ double * solveLinear(struct Data data, int sParameter, int iterations) {
     int fullIterations = 0;
 
     while (true) {
+#ifdef DEBUG_PRINTS
         printVector(xIVector, dimension);
+#endif
 
         k = 0;
         assignVector(xIVector, xZeroVector, dimension);

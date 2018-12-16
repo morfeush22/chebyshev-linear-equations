@@ -11,4 +11,6 @@ file(GLOB SOURCES
         src/*.c
         )
 
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG_PRINTS")
+
 add_executable(main main.c ${SOURCES})
