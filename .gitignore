@@ -1,4 +1,5 @@
 .idea
+*.cbp
 cmake-build-*
 CMakeFiles
 cmake_install.cmake

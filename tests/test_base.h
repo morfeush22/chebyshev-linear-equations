@@ -5,6 +5,8 @@
 #ifndef CHEBYSHEV_TEST_BASE_H
 #define CHEBYSHEV_TEST_BASE_H
 
+#include <stdlib.h>
+
 #define ASSERT_EQUAL(x, y)              \
 {                                       \
     if ( (x) != (y) )                   \

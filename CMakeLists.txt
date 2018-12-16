@@ -6,4 +6,9 @@ set(CMAKE_C_STANDARD 11)
 enable_testing()
 add_subdirectory(tests)
 
-add_executable(main main.c src/chebyshev.h)
+file(GLOB SOURCES
+        src/*.h
+        src/*.c
+        )
+
+add_executable(main main.c ${SOURCES})
