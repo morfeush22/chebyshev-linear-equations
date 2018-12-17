@@ -16,8 +16,6 @@ struct Data {
 struct Data loadDataFromFile(const char * path);
 void deallocateData(struct Data data);
 
-double maxMatrixElement(struct Data data);
-
 void printData(struct Data data);
 
 

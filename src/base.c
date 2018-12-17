@@ -29,21 +29,6 @@ void deallocateData(struct Data data) {
     free(data.bVector);
 }
 
-double maxMatrixElement(struct Data data) {
-    int i, j;
-    double maxElement = 0;
-
-    for (i = 0; i < data.dimension; ++i) {
-        for (j = 0 ; j < data.dimension; ++j) {
-            if (data.matrix[i][j] > maxElement) {
-                maxElement = data.matrix[i][j];
-            }
-        }
-    }
-
-    return maxElement;
-}
-
 void printData(struct Data data) {
     int i, j;
 

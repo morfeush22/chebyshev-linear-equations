@@ -7,13 +7,13 @@
 #include "stdbool.h"
 #include "stdlib.h"
 
-double * solveLinear(struct Data data, int sParameter, int iterations) {
+double * solveLinear(const struct Data data, double precision, int sParameter, int * iterations) {
+    const double * const * matrix = (const double * const *)data.matrix;
+    const double * bVector = data.bVector;
     int dimension = data.dimension;
-    double ** matrix = data.matrix;
-    double * bVector = data.bVector;
 
     double alfa = 100;
-    double beta = 2.0 * maxMatrixElement(data);
+    double beta = 2.0 * findMaxElementInMatrix(matrix, dimension);
 
     double * xIVector = malloc(dimension * sizeof(double));
     double * xZeroVector = malloc(dimension * sizeof(double));
@@ -36,6 +36,7 @@ double * solveLinear(struct Data data, int sParameter, int iterations) {
 
     while (true) {
 #ifdef DEBUG_PRINTS
+        printf("X VECTOR\n");
         printVector(xIVector, dimension);
 #endif
 
@@ -67,7 +68,18 @@ double * solveLinear(struct Data data, int sParameter, int iterations) {
 
         assignVector(xZeroVector, xPrevVector, dimension);
 
-        if (fullIterations > iterations) {
+        multiplyMatrixByVector(matrix, xZeroVector, t1Vector, dimension);
+        subtractVectors(bVector, t1Vector, t1Vector, dimension);
+
+#ifdef DEBUG_PRINTS
+        printf("DIFF VECTOR\n");
+        printVector(t1Vector, dimension);
+#endif
+
+        double currPrecision = findMaxElementInVector(t1Vector, dimension);
+
+        if (currPrecision < precision) {
+            *iterations = fullIterations;
             break;
         }
 
