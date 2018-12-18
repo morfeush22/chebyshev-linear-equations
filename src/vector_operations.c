@@ -3,6 +3,7 @@
 //
 
 #include "vector_operations.h"
+#include "math.h"
 #include "stdio.h"
 
 void addVectors(const double * vector1, const double * vector2, double * sink, int size) {
@@ -32,11 +33,11 @@ double findMaxElementInMatrix(const double * const * matrix, int dimension) {
     return maxElement;
 }
 
-double findMaxElementInVector(const double * vector, int size) {
+double findAbsMaxElementInVector(const double * vector, int size) {
     double maxElement = 0;
 
     for (int i = 0; i < size; ++i) {
-        if (vector[i] > maxElement) {
+        if (fabs(vector[i]) > fabs(maxElement)) {
             maxElement = vector[i];
         }
     }
@@ -44,7 +45,7 @@ double findMaxElementInVector(const double * vector, int size) {
     return maxElement;
 }
 
-void multiplyMatrixByVector(const double * const* matrix, const double * vector, double *sink, int dimension) {
+void multiplyMatrixByVector(const double * const * matrix, const double * vector, double * sink, int dimension) {
     double sum;
 
     for (int i = 0; i < dimension; ++i) {

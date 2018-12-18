@@ -10,3 +10,5 @@ main
 Testing
 tests/basic_tests
 CTestTestfile.cmake
+
+venv

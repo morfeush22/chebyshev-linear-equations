@@ -4,6 +4,7 @@
 
 #include "chebyshev.h"
 #include "vector_operations.h"
+#include "math.h"
 #include "stdbool.h"
 #include "stdlib.h"
 
@@ -66,7 +67,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
             }
         }
 
-        assignVector(xZeroVector, xPrevVector, dimension);
+        assignVector(xZeroVector, xIVector, dimension);
 
         multiplyMatrixByVector(matrix, xZeroVector, t1Vector, dimension);
         subtractVectors(bVector, t1Vector, t1Vector, dimension);
@@ -76,7 +77,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
         printVector(t1Vector, dimension);
 #endif
 
-        double currPrecision = findMaxElementInVector(t1Vector, dimension);
+        double currPrecision = fabs(findAbsMaxElementInVector(t1Vector, dimension));
 
         if (currPrecision < precision) {
             *iterations = fullIterations;
