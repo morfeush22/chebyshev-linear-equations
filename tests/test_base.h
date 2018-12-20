@@ -19,7 +19,6 @@
         printf("%.6f IS DIFFERENT FROM %.6f more than %.6f\n", y, x, precision);\
         exit(EXIT_FAILURE);                                                     \
     }                                                                           \
-    printf(".");                                                                \
 }
 
 static void readVector(FILE * fp, double * sink, int size) {
