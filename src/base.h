@@ -22,6 +22,6 @@ void printData(struct Data data);
 static struct Data parseData(FILE * fp, int dimension);
 static struct Data allocateData(int dimension);
 static void readData(FILE * fp, struct Data data);
-static int numberOfLines(FILE * fp);
+int numberOfLines(FILE * fp);
 
 #endif //CHEBYSHEV_BASE_H

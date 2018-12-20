@@ -74,11 +74,11 @@ void readData(FILE * fp, struct Data data) {
 
     for (i = 0; i < data.dimension; ++i) {
         for (j = 0 ; j < data.dimension; ++j) {
-            fscanf(fp,"%lf", &var);
+            fscanf(fp, "%lf", &var);
             data.matrix[i][j] = var;
         }
 
-        fscanf(fp,"%lf",&var);
+        fscanf(fp,"%lf", &var);
         data.bVector[i] = var;
     }
 }

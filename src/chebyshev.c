@@ -79,7 +79,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
 
         double currPrecision = fabs(findAbsMaxElementInVector(t1Vector, dimension));
 
-        if (currPrecision < precision) {
+        if (currPrecision <= precision) {
             *iterations = fullIterations;
             break;
         }

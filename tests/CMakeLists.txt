@@ -3,5 +3,10 @@ project(chebyshev_tests C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(basic_tests ../src/base.c basic_tests.c)
+file(GLOB SOURCES
+        ../src/*.h
+        ../src/*.c
+        )
+
+add_executable(basic_tests basic_tests.c ${SOURCES})
 add_test(basic_tests basic_tests)
