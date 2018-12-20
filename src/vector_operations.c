@@ -51,8 +51,9 @@ void multiplyMatrixByVector(const double * const * matrix, const double * vector
     for (int i = 0; i < dimension; ++i) {
         sum = 0;
 
-        for (int j = 0; j < dimension; ++j)
+        for (int j = 0; j < dimension; ++j) {
             sum += matrix[i][j] * vector[j];
+        }
 
         sink[i] = sum;
     }
@@ -66,10 +67,8 @@ void multiplyVectorByScalar(const double * vector, double scalar, double * sink,
 
 void printVector(double * vector, int size) {
     for (int i = 0; i < size; ++i) {
-        printf("[%.6f]\n", vector[i]);
+        printf("%.6f\n", vector[i]);
     }
-
-    printf("\n");
 }
 
 void subtractVectors(const double * from, const double * vector, double * sink, int size) {

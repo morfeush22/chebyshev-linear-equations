@@ -37,8 +37,6 @@ def generate_a_matrix(a, b, dimension):
     Q = rvs(dimension)
     M = Q.dot(mat).dot(Q.T)
 
-    print(numpy.sort(numpy.linalg.eigvals(M)))
-
     return M
 
 
@@ -69,6 +67,12 @@ def main():
     with open(output_data_path, 'w') as file:
         for row in range(0, dimension):
             file.writelines(' '.join([format_output(x) for x in data[row]]) + '\n')
+
+    solution = numpy.linalg.solve(matrix, b_vector)
+
+    with open(output_data_path + '.expected_solution', 'w') as file:
+        for n in solution:
+            file.writelines(format_output(n) + '\n')
 
 
 if __name__ == '__main__':

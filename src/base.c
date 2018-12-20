@@ -9,8 +9,9 @@ struct Data loadDataFromFile(const char * path) {
     FILE * fp;
 
     fp = fopen(path, "r");
-    if (fp == NULL)
+    if (fp == NULL) {
         exit(EXIT_FAILURE);
+    }
 
     int dimension = numberOfLines(fp);
 
@@ -22,8 +23,9 @@ struct Data loadDataFromFile(const char * path) {
 }
 
 void deallocateData(struct Data data) {
-    for (int i = 0; i < data.dimension; ++i)
+    for (int i = 0; i < data.dimension; ++i) {
         free(data.matrix[i]);
+    }
 
     free(data.matrix);
     free(data.bVector);
@@ -33,14 +35,11 @@ void printData(struct Data data) {
     int i, j;
 
     for (i = 0; i < data.dimension; ++i) {
-        printf("[ ");
         for (j = 0 ; j < data.dimension; ++j) {
             printf("%.6f ", data.matrix[i][j]);
         }
 
-        printf("][ ");
-        printf("%.6f ", data.bVector[i]);
-        printf("]\n");
+        printf("%.6f\n", data.bVector[i]);
     }
 }
 
@@ -91,8 +90,9 @@ int numberOfLines(FILE * fp) {
     while(!feof(fp)) {
         ch = fgetc(fp);
 
-        if (ch == '\n')
+        if (ch == '\n') {
             lines++;
+        }
     }
 
     fseek(fp, 0, SEEK_SET);

@@ -20,7 +20,6 @@ int main(int argc, char ** argv) {
 
     double * result = solveLinear(data, precision, sParameter, &iterations);
 
-    printf("FINAL RESULT AFTER %i ITERATIONS IS:\n", iterations);
     printVector(result, dimension);
 
     deallocateData(data);
