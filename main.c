@@ -4,26 +4,29 @@
 #include "stdlib.h"
 
 int main(int argc, char ** argv) {
-    if (argc < 4) {
+    if (argc < 5) {
         printf("Usage:\n");
-        printf("%s inputDataPath precision sParameter\n", argv[0]);
+        printf("%s inputDataPath precision initSParameter calculationsNum\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
     const char * inputDataPath = argv[1];
     double precision = atof(argv[2]);
-    int sParameter = atoi(argv[3]);
-    int iterations = 0;
+    int initSParameter = atoi(argv[3]);
+    int calculationsNum = atoi(argv[4]);
+    int iterations;
 
     struct Data data = loadDataFromFile(inputDataPath);
-    int dimension = data.dimension;
 
-    double * result = solveLinear(data, precision, sParameter, &iterations);
+    for (int sParameter = initSParameter; sParameter < initSParameter + calculationsNum; ++sParameter) {
+        iterations = 0;
 
-    printVector(result, dimension);
+        double *result = solveLinear(data, precision, sParameter, &iterations);
+
+        free(result);
+    }
 
     deallocateData(data);
-    free(result);
 
     return 0;
 }
