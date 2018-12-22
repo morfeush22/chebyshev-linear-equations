@@ -14,12 +14,11 @@ int main(int argc, char ** argv) {
     double precision = atof(argv[2]);
     int initSParameter = atoi(argv[3]);
     int calculationsNum = atoi(argv[4]);
-    int iterations;
-
+    
     struct Data data = loadDataFromFile(inputDataPath);
 
     for (int sParameter = initSParameter; sParameter < initSParameter + calculationsNum; ++sParameter) {
-        iterations = 0;
+        int iterations = 0;
 
         double *result = solveLinear(data, precision, sParameter, &iterations);
 
