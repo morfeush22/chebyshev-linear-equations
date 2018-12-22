@@ -8,7 +8,8 @@ Makefile
 main
 
 Testing
-tests/basic_tests
+tests/basic_test
+tests/various_s_parameter_test
 CTestTestfile.cmake
 
 venv

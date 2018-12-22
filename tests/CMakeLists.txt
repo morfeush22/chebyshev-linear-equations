@@ -8,5 +8,8 @@ file(GLOB SOURCES
         ../src/*.c
         )
 
-add_executable(basic_tests basic_tests.c ${SOURCES})
-add_test(basic_tests basic_tests)
+add_executable(basic_test basic.c ${SOURCES})
+add_test(basic_test basic_test)
+
+add_executable(various_s_parameter_test various_s_parameter.c ${SOURCES})
+add_test(various_s_parameter_test various_s_parameter_test)
