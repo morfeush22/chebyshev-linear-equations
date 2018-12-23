@@ -1,6 +1,7 @@
 #include "src/base.h"
 #include "src/chebyshev.h"
 #include "src/vector_operations.h"
+#include "sys/time.h"
 #include "stdlib.h"
 
 int main(int argc, char ** argv) {
@@ -17,10 +18,20 @@ int main(int argc, char ** argv) {
     
     struct Data data = loadDataFromFile(inputDataPath);
 
-    for (int sParameter = initSParameter; sParameter < initSParameter + calculationsNum; ++sParameter) {
-        int iterations = 0;
+    int iterations;
 
+    struct timespec start, stop;
+    unsigned long deltaMS;
+
+    for (int sParameter = initSParameter; sParameter < initSParameter + calculationsNum; ++sParameter) {
+        clock_gettime(CLOCK_MONOTONIC_RAW, &start);
         double *result = solveLinear(data, precision, sParameter, &iterations);
+        clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
+
+        deltaMS = (unsigned long)
+                (stop.tv_sec - start.tv_sec) * 1000000 + (stop.tv_nsec - start.tv_nsec) / 1000;
+
+        printf("%i %lu\n", sParameter, deltaMS);
 
         free(result);
     }
