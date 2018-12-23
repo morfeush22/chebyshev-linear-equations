@@ -69,6 +69,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
 
         assignVector(xZeroVector, xIVector, dimension);
 
+        // calculate error
         multiplyMatrixByVector(matrix, xZeroVector, t1Vector, dimension);
         subtractVectors(bVector, t1Vector, t1Vector, dimension);
 
