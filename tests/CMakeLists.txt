@@ -13,3 +13,9 @@ add_test(basic_test basic_test)
 
 add_executable(various_s_parameter_test various_s_parameter.c ${SOURCES})
 add_test(various_s_parameter_test various_s_parameter_test)
+
+file(GLOB TEST_FILES
+        "sources/*"
+        )
+
+file(COPY ${TEST_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sources)
