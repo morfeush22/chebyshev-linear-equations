@@ -25,9 +25,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
     double * t1Vector = malloc(dimension * sizeof(double));
     double * t2Vector = malloc(dimension * sizeof(double));
 
-    int i, k;
-
-    i = 0;
+    int i = 0;
     double omegaZero = (beta - alfa) / (beta + alfa);
     double c = 2.0 / (beta + alfa);
     double L = 2.0 * (beta + alfa) / (beta - alfa);
@@ -41,12 +39,12 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
         printVector(xIVector, dimension);
 #endif
 
-        k = 0;
+        int k = 0;
         assignVector(xIVector, xZeroVector, dimension);
         double omegaPrev = 0;
         double omegaI = omegaZero;
 
-        while (true) {
+        for (; k < sParameter; ++i, ++k) {
             multiplyMatrixByVector(matrix, xIVector, t1Vector, dimension);
             subtractVectors(t1Vector, bVector, t1Vector, dimension);
             multiplyVectorByScalar(t1Vector, c * (1 + omegaI * omegaPrev), t1Vector, dimension);
@@ -60,11 +58,6 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
 
             omegaPrev = omegaI;
             omegaI = 1.0 / (L - omegaI);
-
-            ++i, ++k;
-            if (k >= sParameter) {
-                break;
-            }
         }
 
         assignVector(xZeroVector, xIVector, dimension);
