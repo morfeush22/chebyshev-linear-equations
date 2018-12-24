@@ -7,14 +7,14 @@ import numpy
 def format_output(value):
     return "%.6f" % value
 
-def rvs(dimension):
+def rvs(loc, scale, dimension):
     random_state = numpy.random
 
     H = numpy.eye(dimension)
     D = numpy.ones((dimension,))
 
     for n in range(1, dimension):
-        x = random_state.normal(size=(dimension - n + 1,))
+        x = random_state.normal(loc=loc, scale=scale, size=(dimension - n + 1,))
         D[n - 1] = numpy.sign(x[0])
         x[0] = x[0] - D[n - 1] * numpy.sqrt((x * x).sum())
         Hx = (numpy.eye(dimension - n + 1) - 2.0 * numpy.outer(x, x) / (x * x).sum())
@@ -28,13 +28,13 @@ def rvs(dimension):
 
     return H
 
-def generate_a_matrix(a, b, dimension):
+def generate_a_matrix(loc, scale, a, b, dimension):
     mat = numpy.zeros((dimension, dimension))
 
     for n in range(0, dimension):
         mat[n][n] = numpy.random.randint(a, b + 1)
 
-    Q = rvs(dimension)
+    Q = rvs(loc, scale, dimension)
     M = Q.dot(mat).dot(Q.T)
 
     return M
@@ -49,17 +49,19 @@ def generate_b_vector(a, b, dimension):
     return b_vector
 
 def main():
-    if len(sys.argv) < 5:
+    if len(sys.argv) < 7:
         print('Usage:')
-        print("{} output_data_path a b dimension".format(sys.argv[0]))
+        print("{} output_data_path loc scale a b dimension".format(sys.argv[0]))
         sys.exit(1)
 
     output_data_path = sys.argv[1]
-    a = float(sys.argv[2])
-    b = float(sys.argv[3])
-    dimension = int(sys.argv[4])
+    loc = float(sys.argv[2])
+    scale = float(sys.argv[3])
+    a = float(sys.argv[4])
+    b = float(sys.argv[5])
+    dimension = int(sys.argv[6])
 
-    matrix = generate_a_matrix(a, b, dimension)
+    matrix = generate_a_matrix(loc, scale, a, b, dimension)
     b_vector = generate_b_vector(a, b, dimension)
 
     data = numpy.append(matrix, b_vector, axis=1)
