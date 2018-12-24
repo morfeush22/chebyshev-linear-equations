@@ -53,6 +53,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
             multiplyVectorByScalar(t2Vector, omegaI * omegaPrev, t2Vector, dimension);
 
             addVectors(xIVector, t2Vector, t2Vector, dimension);
+
             assignVector(xPrevVector, xIVector, dimension);
             subtractVectors(t2Vector, t1Vector, xIVector, dimension);
 
