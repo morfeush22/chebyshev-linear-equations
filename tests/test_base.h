@@ -12,13 +12,13 @@
 
 #define PRECISION 0.000001
 
-#define ASSERT_EQUAL(x, y, precision)                                           \
-{                                                                               \
-    if ( fabs((x) - (y)) > (precision))                                         \
-    {                                                                           \
-        printf("%.6f IS DIFFERENT FROM %.6f more than %.6f\n", y, x, precision);\
-        exit(EXIT_FAILURE);                                                     \
-    }                                                                           \
+#define ASSERT_EQUAL(x, y, precision)                                                       \
+{                                                                                           \
+    if ( fabs((x) - (y)) > (precision))                                                     \
+    {                                                                                       \
+        printf("%.6f IS DIFFERENT FROM %.6f more than %.6f at %i\n", y, x, precision, i);   \
+        exit(EXIT_FAILURE);                                                                 \
+    }                                                                                       \
 }
 
 static void readVector(FILE * fp, double * sink, int size) {

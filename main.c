@@ -15,7 +15,7 @@ int main(int argc, char ** argv) {
     double precision = atof(argv[2]);
     int initSParameter = atoi(argv[3]);
     int calculationsNum = atoi(argv[4]);
-    
+
     struct Data data = loadDataFromFile(inputDataPath);
 
     int iterations;
