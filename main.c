@@ -23,7 +23,15 @@ int main(int argc, char ** argv) {
     int initSParameter = atoi(argv[3]);
     int calculationsNum = atoi(argv[4]);
 
-    struct Data data = loadDataFromFile(inputDataPath);
+    struct Data data;
+    if (rank == 0) {
+        data = loadDataFromFile(inputDataPath);
+    }
+    else {
+        data.matrix = NULL;
+        data.bVector = NULL;
+        data.dimension = 0;
+    }
 
     int iterations;
 
@@ -31,14 +39,20 @@ int main(int argc, char ** argv) {
     unsigned long deltaUS;
 
     for (int sParameter = initSParameter; sParameter < initSParameter + calculationsNum; ++sParameter) {
-        clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-        double *result = solveLinear(data, precision, sParameter, &iterations);
-        clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
+        if (rank == 0) {
+            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+        }
 
-        deltaUS = (unsigned long)
-                (stop.tv_sec - start.tv_sec) * 1000000 + (stop.tv_nsec - start.tv_nsec) / 1000;
+        double *result = solveLinear(data, precision, sParameter, &iterations, rank, size);
 
-        printf("%i %lu\n", sParameter, deltaUS);
+        if (rank == 0) {
+            clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
+
+            deltaUS = (unsigned long)
+                              (stop.tv_sec - start.tv_sec) * 1000000 + (stop.tv_nsec - start.tv_nsec) / 1000;
+
+            printf("%i %lu\n", sParameter, deltaUS);
+        }
 
         free(result);
     }

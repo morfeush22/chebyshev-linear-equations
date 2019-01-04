@@ -8,7 +8,7 @@
 #include "stdbool.h"
 #include "stdlib.h"
 
-double * solveLinear(const struct Data data, double precision, int sParameter, int * iterations) {
+double * solveLinear(const struct Data data, double precision, int sParameter, int * iterations, int rank, int size) {
     const double * const * matrix = (const double * const *)data.matrix;
     const double * bVector = data.bVector;
     int dimension = data.dimension;
@@ -87,5 +87,10 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
     free(t1Vector);
     free(t2Vector);
 
-    return xIVector;
+    if (rank == 0) {
+        return xIVector;
+    }
+    else {
+        return NULL;
+    }
 }
