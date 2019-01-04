@@ -8,18 +8,16 @@ file(GLOB SOURCES
         ../src/*.c
         )
 
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-endif()
+find_package(MPI REQUIRED)
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 add_executable(basic_test basic.c ${SOURCES})
 add_test(basic_test basic_test)
-target_link_libraries(basic_test m)
+target_link_libraries(basic_test PRIVATE m ${MPI_C_LIBRARIES})
 
 add_executable(various_s_parameter_test various_s_parameter.c ${SOURCES})
 add_test(various_s_parameter_test various_s_parameter_test)
-target_link_libraries(various_s_parameter_test m)
+target_link_libraries(various_s_parameter_test PRIVATE m ${MPI_C_LIBRARIES})
 
 file(GLOB TEST_FILES
         "sources/*"

@@ -8,14 +8,12 @@
 #include "string.h"
 
 void addVectors(const double * vector1, const double * vector2, double * sink, int size) {
-    #pragma omp parallel for
     for (int i = 0; i < size; ++i) {
         sink[i] = vector1[i] + vector2[i];
     }
 }
 
 void assignVector(double * to, const double * from, int size) {
-    #pragma omp parallel for
     for (int i = 0; i < size; ++i) {
         to[i] = from[i];
     }
@@ -24,7 +22,6 @@ void assignVector(double * to, const double * from, int size) {
 double findMaxElementInMatrix(const double * const * matrix, int dimension) {
     double maxElement = 0;
 
-    #pragma omp parallel for collapse(2) reduction(max:maxElement)
     for (int i = 0; i < dimension; ++i) {
         for (int j = 0 ; j < dimension; ++j) {
             maxElement = fmax(maxElement, matrix[i][j]);
@@ -37,7 +34,6 @@ double findMaxElementInMatrix(const double * const * matrix, int dimension) {
 double findAbsMaxElementInVector(const double * vector, int size) {
     double maxElement = 0;
 
-    #pragma omp parallel for reduction(max:maxElement)
     for (int i = 0; i < size; ++i) {
         maxElement = fmax(maxElement, fabs(vector[i]));
     }
@@ -46,7 +42,6 @@ double findAbsMaxElementInVector(const double * vector, int size) {
 }
 
 void multiplyMatrixByVector(const double * const * matrix, const double * vector, double * sink, int dimension) {
-    #pragma omp parallel for
     for (int i = 0; i < dimension; ++i) {
         double sum = 0;
 
@@ -59,7 +54,6 @@ void multiplyMatrixByVector(const double * const * matrix, const double * vector
 }
 
 void multiplyVectorByScalar(const double * vector, double scalar, double * sink, int size) {
-    #pragma omp parallel for
     for (int i = 0; i < size; ++i) {
         sink[i] = vector[i] * scalar;
     }
@@ -72,7 +66,6 @@ void printVector(double * vector, int size) {
 }
 
 void subtractVectors(const double * from, const double * vector, double * sink, int size) {
-    #pragma omp parallel for
     for (int i = 0; i < size; ++i) {
         sink[i] = from[i] - vector[i];
     }
