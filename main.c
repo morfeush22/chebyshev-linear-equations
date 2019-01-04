@@ -1,10 +1,17 @@
 #include "src/base.h"
 #include "src/chebyshev.h"
 #include "src/vector_operations.h"
+#include "mpi.h"
 #include "stdlib.h"
 #include "time.h"
 
 int main(int argc, char ** argv) {
+    int rank, size;
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
     if (argc < 5) {
         printf("Usage:\n");
         printf("%s inputDataPath precision initSParameter calculationsNum\n", argv[0]);
@@ -37,6 +44,8 @@ int main(int argc, char ** argv) {
     }
 
     deallocateData(data);
+
+    MPI_Finalize();
 
     return 0;
 }
