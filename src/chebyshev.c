@@ -5,6 +5,7 @@
 #include "chebyshev.h"
 #include "vector_operations.h"
 #include "math.h"
+#include "mpi.h"
 #include "stdbool.h"
 #include "stdlib.h"
 
@@ -16,33 +17,42 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
     double alfa = 100;
     double beta = 2.0 * findMaxElementInMatrix(matrix, dimension);
 
-    double * xIVector = malloc(dimension * sizeof(double));
-    double * xZeroVector = malloc(dimension * sizeof(double));
-    double * xPrevVector = malloc(dimension * sizeof(double));
-    zeroVector(xIVector, dimension);
-    zeroVector(xZeroVector, dimension);
+    double * xIVector, * xZeroVector, * xPrevVector, * t1Vector, * t2Vector;
+    xIVector = xZeroVector = xPrevVector = t1Vector = t2Vector = NULL;
 
-    double * t1Vector = malloc(dimension * sizeof(double));
-    double * t2Vector = malloc(dimension * sizeof(double));
+    double omegaZero, c, L;
+
+    if (rank == 0) {
+        xIVector = malloc(dimension * sizeof(double));
+        xZeroVector = malloc(dimension * sizeof(double));
+        xPrevVector = malloc(dimension * sizeof(double));
+        zeroVector(xIVector, dimension);
+        zeroVector(xZeroVector, dimension);
+
+        t1Vector = malloc(dimension * sizeof(double));
+        t2Vector = malloc(dimension * sizeof(double));
+
+        omegaZero = (beta - alfa) / (beta + alfa);
+        c = 2.0 / (beta + alfa);
+        L = 2.0 * (beta + alfa) / (beta - alfa);
+
+        zeroVector(xPrevVector, dimension);
+    }
 
     int i = 0;
-    double omegaZero = (beta - alfa) / (beta + alfa);
-    double c = 2.0 / (beta + alfa);
-    double L = 2.0 * (beta + alfa) / (beta - alfa);
-    zeroVector(xPrevVector, dimension);
-
     int fullIterations = 0;
 
     while (true) {
-#ifdef DEBUG_PRINTS
-        printf("X VECTOR\n");
-        printVector(xIVector, dimension);
-#endif
-
         int k = 0;
+
         assignVector(xIVector, xZeroVector, dimension);
-        double omegaPrev = 0;
-        double omegaI = omegaZero;
+
+        double omegaPrev, omegaI;
+
+        if (rank == 0) {
+            omegaPrev = 0;
+            omegaI = omegaZero;
+        }
 
         for (; k < sParameter; ++i, ++k) {
             multiplyMatrixByVector(matrix, xIVector, t1Vector, dimension);
@@ -57,8 +67,10 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
             assignVector(xPrevVector, xIVector, dimension);
             subtractVectors(t2Vector, t1Vector, xIVector, dimension);
 
-            omegaPrev = omegaI;
-            omegaI = 1.0 / (L - omegaI);
+            if (rank == 0) {
+                omegaPrev = omegaI;
+                omegaI = 1.0 / (L - omegaI);
+            }
         }
 
         assignVector(xZeroVector, xIVector, dimension);
@@ -67,12 +79,9 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
         multiplyMatrixByVector(matrix, xZeroVector, t1Vector, dimension);
         subtractVectors(bVector, t1Vector, t1Vector, dimension);
 
-#ifdef DEBUG_PRINTS
-        printf("DIFF VECTOR\n");
-        printVector(t1Vector, dimension);
-#endif
-
         double currPrecision = fabs(findAbsMaxElementInVector(t1Vector, dimension));
+
+        MPI_Bcast(&currPrecision, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
         if (currPrecision <= precision) {
             *iterations = fullIterations;
