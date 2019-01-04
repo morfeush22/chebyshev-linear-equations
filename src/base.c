@@ -23,10 +23,9 @@ struct Data loadDataFromFile(const char * path) {
 }
 
 void deallocateData(struct Data data) {
-    for (int i = 0; i < data.dimension; ++i) {
-        free(data.matrix[i]);
-    }
+    double * memBlock = data.matrix[0];
 
+    free(memBlock);
     free(data.matrix);
     free(data.bVector);
 }
@@ -52,10 +51,11 @@ struct Data parseData(FILE * fp, int dimension) {
 }
 
 struct Data allocateData(int dimension) {
+    double * memBlock = malloc(dimension * dimension * sizeof(double));
     double ** matrix = malloc(dimension * sizeof(double *));
 
     for (int i = 0; i < dimension; ++i) {
-        matrix[i] = malloc(dimension * sizeof(double));
+        matrix[i] = memBlock + i * dimension;
     }
 
     double * bVector = malloc(dimension * sizeof(double));

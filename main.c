@@ -57,7 +57,9 @@ int main(int argc, char ** argv) {
         free(result);
     }
 
-    deallocateData(data);
+    if (rank == 0) {
+        deallocateData(data);
+    }
 
     MPI_Finalize();
 
