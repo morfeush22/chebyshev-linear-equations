@@ -15,7 +15,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
     int dimension = data.dimension;
 
     double alfa = 100;
-    double beta = 2.0 * findMaxElementInMatrix(matrix, dimension);
+    double beta = 2.0 * findMaxElementInMatrix(matrix, dimension, rank, size);
 
     double * xIVector, * xZeroVector, * xPrevVector, * t1Vector, * t2Vector;
     xIVector = xZeroVector = xPrevVector = t1Vector = t2Vector = NULL;
@@ -55,17 +55,17 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
         }
 
         for (; k < sParameter; ++i, ++k) {
-            multiplyMatrixByVector(matrix, xIVector, t1Vector, dimension);
-            subtractVectors(t1Vector, bVector, t1Vector, dimension);
-            multiplyVectorByScalar(t1Vector, c * (1 + omegaI * omegaPrev), t1Vector, dimension);
+            multiplyMatrixByVector(matrix, xIVector, t1Vector, dimension, rank, size);
+            subtractVectors(t1Vector, bVector, t1Vector, dimension, rank, size);
+            multiplyVectorByScalar(t1Vector, c * (1 + omegaI * omegaPrev), t1Vector, dimension, rank, size);
 
-            subtractVectors(xIVector, xPrevVector, t2Vector, dimension);
-            multiplyVectorByScalar(t2Vector, omegaI * omegaPrev, t2Vector, dimension);
+            subtractVectors(xIVector, xPrevVector, t2Vector, dimension, rank, size);
+            multiplyVectorByScalar(t2Vector, omegaI * omegaPrev, t2Vector, dimension, rank, size);
 
-            addVectors(xIVector, t2Vector, t2Vector, dimension);
+            addVectors(xIVector, t2Vector, t2Vector, dimension, rank, size);
 
             assignVector(xPrevVector, xIVector, dimension);
-            subtractVectors(t2Vector, t1Vector, xIVector, dimension);
+            subtractVectors(t2Vector, t1Vector, xIVector, dimension, rank, size);
 
             if (rank == 0) {
                 omegaPrev = omegaI;
@@ -76,10 +76,10 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
         assignVector(xZeroVector, xIVector, dimension);
 
         // calculate error
-        multiplyMatrixByVector(matrix, xZeroVector, t1Vector, dimension);
-        subtractVectors(bVector, t1Vector, t1Vector, dimension);
+        multiplyMatrixByVector(matrix, xZeroVector, t1Vector, dimension, rank, size);
+        subtractVectors(bVector, t1Vector, t1Vector, dimension, rank, size);
 
-        double currPrecision = fabs(findAbsMaxElementInVector(t1Vector, dimension));
+        double currPrecision = fabs(findAbsMaxElementInVector(t1Vector, dimension, rank, size));
 
         MPI_Bcast(&currPrecision, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 

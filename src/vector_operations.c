@@ -4,10 +4,11 @@
 
 #include "vector_operations.h"
 #include "math.h"
+#include "mpi.h"
 #include "stdio.h"
 #include "string.h"
 
-void addVectors(const double * vector1, const double * vector2, double * sink, int size) {
+void addVectors(const double * vector1, const double * vector2, double * sink, int size, int rank, int procNum) {
     for (int i = 0; i < size; ++i) {
         sink[i] = vector1[i] + vector2[i];
     }
@@ -19,7 +20,7 @@ void assignVector(double * to, const double * from, int size) {
     }
 }
 
-double findMaxElementInMatrix(const double * const * matrix, int dimension) {
+double findMaxElementInMatrix(const double * const * matrix, int dimension, int rank, int procNum) {
     double maxElement = 0;
 
     for (int i = 0; i < dimension; ++i) {
@@ -31,7 +32,7 @@ double findMaxElementInMatrix(const double * const * matrix, int dimension) {
     return maxElement;
 }
 
-double findAbsMaxElementInVector(const double * vector, int size) {
+double findAbsMaxElementInVector(const double * vector, int size, int rank, int procNum) {
     double maxElement = 0;
 
     for (int i = 0; i < size; ++i) {
@@ -41,7 +42,8 @@ double findAbsMaxElementInVector(const double * vector, int size) {
     return maxElement;
 }
 
-void multiplyMatrixByVector(const double * const * matrix, const double * vector, double * sink, int dimension) {
+void multiplyMatrixByVector(const double * const * matrix, const double * vector, double * sink, int dimension,
+        int rank, int procNum) {
     for (int i = 0; i < dimension; ++i) {
         double sum = 0;
 
@@ -53,7 +55,7 @@ void multiplyMatrixByVector(const double * const * matrix, const double * vector
     }
 }
 
-void multiplyVectorByScalar(const double * vector, double scalar, double * sink, int size) {
+void multiplyVectorByScalar(const double * vector, double scalar, double * sink, int size, int rank, int procNum) {
     for (int i = 0; i < size; ++i) {
         sink[i] = vector[i] * scalar;
     }
@@ -65,7 +67,7 @@ void printVector(double * vector, int size) {
     }
 }
 
-void subtractVectors(const double * from, const double * vector, double * sink, int size) {
+void subtractVectors(const double * from, const double * vector, double * sink, int size, int rank, int procNum) {
     for (int i = 0; i < size; ++i) {
         sink[i] = from[i] - vector[i];
     }
