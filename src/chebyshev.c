@@ -81,7 +81,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
         multiplyMatrixByVector(matrix, xZeroVector, t1Vector, dimension, rank, size);
         subtractVectors(bVector, t1Vector, t1Vector, dimension, rank, size);
 
-        double currPrecision = fabs(findAbsMaxElementInVector(t1Vector, dimension, rank, size));
+        double currPrecision = findAbsMaxElementInVector(t1Vector, dimension, rank, size);
 
         MPI_Bcast(&currPrecision, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 

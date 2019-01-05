@@ -84,15 +84,30 @@ double findMaxElementInMatrix(const double * const * matrix, int dimension, int 
 }
 
 double findAbsMaxElementInVector(const double * vector, int size, int rank, int procNum) {
-    if (rank == 0) {
-        double maxElement = 0;
+    size_t mallocSize = getChunkSize(size, procNum) * sizeof(double);
+    double * localVector = malloc(mallocSize);
 
-        for (int i = 0; i < size; ++i) {
-            maxElement = fmax(maxElement, fabs(vector[i]));
-        }
+    int * counts = getCounts(size, procNum);
+    int * displacements = getDisplacements(counts, procNum);
 
-        return maxElement;
+    MPI_Scatterv(vector, counts, displacements, MPI_DOUBLE, localVector, counts[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    double maxElement = 0;
+
+    for (int i = 0; i < counts[rank]; ++i) {
+        maxElement = fmax(maxElement, fabs(localVector[i]));
     }
+
+    double globalMaxElement;
+
+    MPI_Reduce(&maxElement, &globalMaxElement, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    free(localVector);
+
+    free(counts);
+    free(displacements);
+
+    return globalMaxElement;
 }
 
 void multiplyMatrixByVector(const double * const * matrix, double * vector, double * sink, int dimension, int rank,
