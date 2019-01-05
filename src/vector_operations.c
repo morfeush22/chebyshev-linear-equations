@@ -70,17 +70,44 @@ void assignVector(double * to, const double * from, int size) {
 }
 
 double findMaxElementInMatrix(const double * const * matrix, int dimension, int rank, int procNum) {
-    if (rank == 0) {
-        double maxElement = 0;
+    size_t mallocSize = getChunkSize(dimension, procNum) * sizeof(double);
+    double * localMatrix = malloc(mallocSize * dimension);
 
-        for (int i = 0; i < dimension; ++i) {
-            for (int j = 0; j < dimension; ++j) {
-                maxElement = fmax(maxElement, matrix[i][j]);
-            }
-        }
+    int * counts = getCounts(dimension, procNum);
+    int * displacements = getDisplacements(counts, procNum);
 
-        return maxElement;
+    int * matrixCounts = malloc(procNum * sizeof(int));
+    int * matrixDisplacements = malloc(procNum * sizeof(int));
+
+    for (int i = 0; i < procNum; ++i) {
+        matrixCounts[i] = counts[i] * dimension;
+        matrixDisplacements[i] = displacements[i] * dimension;
     }
+
+    MPI_Scatterv(*matrix, matrixCounts, matrixDisplacements, MPI_DOUBLE, localMatrix, matrixCounts[rank], MPI_DOUBLE, 0,
+                 MPI_COMM_WORLD);
+
+    double maxElement = 0;
+
+    for (int i = 0; i < counts[rank]; ++i) {
+        for (int j = 0; j < dimension; ++j) {
+            maxElement = fmax(maxElement, *(localMatrix + i * dimension + j));
+        }
+    }
+
+    double globalMaxElement;
+
+    MPI_Reduce(&maxElement, &globalMaxElement, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    free(localMatrix);
+
+    free(counts);
+    free(displacements);
+
+    free(matrixCounts);
+    free(matrixDisplacements);
+
+    return globalMaxElement;
 }
 
 double findAbsMaxElementInVector(const double * vector, int size, int rank, int procNum) {
