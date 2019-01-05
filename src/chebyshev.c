@@ -14,12 +14,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
     const double * bVector = data.bVector;
     int dimension = data.dimension;
 
-    double alfa = 100;
-    double beta = 2.0 * findMaxElementInMatrix(matrix, dimension, rank, size);
-
     double * xIVector, * xZeroVector, * xPrevVector, * t1Vector, * t2Vector;
-
-    double omegaZero, c, L;
 
     xIVector = malloc(dimension * sizeof(double));
     xZeroVector = malloc(dimension * sizeof(double));
@@ -28,7 +23,13 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
     t1Vector = malloc(dimension * sizeof(double));
     t2Vector = malloc(dimension * sizeof(double));
 
+    double maxMatrixElem = findMaxElementInMatrix(matrix, dimension, rank, size);
+    double alfa, beta, omegaZero, c, L;
+
     if (rank == 0) {
+        alfa = 100;
+        beta = 2.0 * maxMatrixElem;
+
         zeroVector(xIVector, dimension);
         zeroVector(xZeroVector, dimension);
 
@@ -39,14 +40,14 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
         zeroVector(xPrevVector, dimension);
     }
 
-    int i = 0;
     int fullIterations = 0;
 
     while (true) {
         int k = 0;
 
-        if (rank == 0)
+        if (rank == 0) {
             assignVector(xIVector, xZeroVector, dimension);
+        }
 
         double omegaPrev, omegaI;
 
@@ -55,7 +56,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
             omegaI = omegaZero;
         }
 
-        for (; k < sParameter; ++i, ++k) {
+        for (; k < sParameter; ++k) {
             multiplyMatrixByVector(matrix, xIVector, t1Vector, dimension, rank, size);
             subtractVectors(t1Vector, bVector, t1Vector, dimension, rank, size);
             multiplyVectorByScalar(t1Vector, c * (1 + omegaI * omegaPrev), t1Vector, dimension, rank, size);
@@ -74,8 +75,9 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
             }
         }
 
-        if (rank == 0)
+        if (rank == 0) {
             assignVector(xZeroVector, xIVector, dimension);
+        }
 
         // calculate error
         multiplyMatrixByVector(matrix, xZeroVector, t1Vector, dimension, rank, size);
@@ -95,6 +97,7 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
 
     free(xZeroVector);
     free(xPrevVector);
+
     free(t1Vector);
     free(t2Vector);
 

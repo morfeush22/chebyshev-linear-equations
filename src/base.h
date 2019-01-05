@@ -15,11 +15,11 @@ struct Data {
 
 struct Data allocateData(int dimension);
 void deallocateData(struct Data * data);
-
 void parseData(FILE * fp, struct Data * data);
 void printData(struct Data * data);
 
-static void readData(FILE * fp, struct Data * data);
 int numberOfLines(FILE * fp);
+
+static void readData(FILE * fp, struct Data * data);
 
 #endif //CHEBYSHEV_BASE_H

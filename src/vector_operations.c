@@ -39,6 +39,7 @@ int * getDisplacements(const int * counts, int procNum) {
 
 void addVectors(const double * vector1, const double * vector2, double * sink, int size, int rank, int procNum) {
     size_t mallocSize = getChunkSize(size, procNum) * sizeof(double);
+
     double * localVec1 = malloc(mallocSize);
     double * localVec2 = malloc(mallocSize);
     double * localSink = malloc(mallocSize);
@@ -71,6 +72,7 @@ void assignVector(double * to, const double * from, int size) {
 
 double findMaxElementInMatrix(const double * const * matrix, int dimension, int rank, int procNum) {
     size_t mallocSize = getChunkSize(dimension, procNum) * sizeof(double);
+
     double * localMatrix = malloc(mallocSize * dimension);
 
     int * counts = getCounts(dimension, procNum);
@@ -112,6 +114,7 @@ double findMaxElementInMatrix(const double * const * matrix, int dimension, int 
 
 double findAbsMaxElementInVector(const double * vector, int size, int rank, int procNum) {
     size_t mallocSize = getChunkSize(size, procNum) * sizeof(double);
+
     double * localVector = malloc(mallocSize);
 
     int * counts = getCounts(size, procNum);
@@ -140,6 +143,7 @@ double findAbsMaxElementInVector(const double * vector, int size, int rank, int 
 void multiplyMatrixByVector(const double * const * matrix, double * vector, double * sink, int dimension, int rank,
         int procNum) {
     size_t mallocSize = getChunkSize(dimension, procNum) * sizeof(double);
+
     double * localMatrix = malloc(mallocSize * dimension);
     double * localSink = malloc(mallocSize);
 
@@ -182,6 +186,7 @@ void multiplyMatrixByVector(const double * const * matrix, double * vector, doub
 
 void multiplyVectorByScalar(const double * vector, double scalar, double * sink, int size, int rank, int procNum) {
     size_t mallocSize = getChunkSize(size, procNum) * sizeof(double);
+
     double * localVector = malloc(mallocSize);
     double * localSink = malloc(mallocSize);
 
@@ -212,6 +217,7 @@ void printVector(double * vector, int size) {
 
 void subtractVectors(const double * from, const double * vector, double * sink, int size, int rank, int procNum) {
     size_t mallocSize = getChunkSize(size, procNum) * sizeof(double);
+
     double * localFrom = malloc(mallocSize);
     double * localVector = malloc(mallocSize);
     double * localSink = malloc(mallocSize);
