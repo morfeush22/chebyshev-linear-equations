@@ -38,8 +38,10 @@ int * getDisplacements(const int * counts, int procNum) {
 }
 
 void addVectors(const double * vector1, const double * vector2, double * sink, int size, int rank, int procNum) {
-    for (int i = 0; i < size; ++i) {
-        sink[i] = vector1[i] + vector2[i];
+    if (rank == 0) {
+        for (int i = 0; i < size; ++i) {
+            sink[i] = vector1[i] + vector2[i];
+        }
     }
 }
 
@@ -50,43 +52,51 @@ void assignVector(double * to, const double * from, int size) {
 }
 
 double findMaxElementInMatrix(const double * const * matrix, int dimension, int rank, int procNum) {
-    double maxElement = 0;
+    if (rank == 0) {
+        double maxElement = 0;
 
-    for (int i = 0; i < dimension; ++i) {
-        for (int j = 0 ; j < dimension; ++j) {
-            maxElement = fmax(maxElement, matrix[i][j]);
+        for (int i = 0; i < dimension; ++i) {
+            for (int j = 0; j < dimension; ++j) {
+                maxElement = fmax(maxElement, matrix[i][j]);
+            }
         }
-    }
 
-    return maxElement;
+        return maxElement;
+    }
 }
 
 double findAbsMaxElementInVector(const double * vector, int size, int rank, int procNum) {
-    double maxElement = 0;
+    if (rank == 0) {
+        double maxElement = 0;
 
-    for (int i = 0; i < size; ++i) {
-        maxElement = fmax(maxElement, fabs(vector[i]));
+        for (int i = 0; i < size; ++i) {
+            maxElement = fmax(maxElement, fabs(vector[i]));
+        }
+
+        return maxElement;
     }
-
-    return maxElement;
 }
 
 void multiplyMatrixByVector(const double * const * matrix, const double * vector, double * sink, int dimension,
         int rank, int procNum) {
-    for (int i = 0; i < dimension; ++i) {
-        double sum = 0;
+    if (rank == 0) {
+        for (int i = 0; i < dimension; ++i) {
+            double sum = 0;
 
-        for (int j = 0; j < dimension; ++j) {
-            sum += matrix[i][j] * vector[j];
+            for (int j = 0; j < dimension; ++j) {
+                sum += matrix[i][j] * vector[j];
+            }
+
+            sink[i] = sum;
         }
-
-        sink[i] = sum;
     }
 }
 
 void multiplyVectorByScalar(const double * vector, double scalar, double * sink, int size, int rank, int procNum) {
-    for (int i = 0; i < size; ++i) {
-        sink[i] = vector[i] * scalar;
+    if (rank == 0) {
+        for (int i = 0; i < size; ++i) {
+            sink[i] = vector[i] * scalar;
+        }
     }
 }
 

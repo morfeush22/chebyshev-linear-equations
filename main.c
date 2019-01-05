@@ -23,14 +23,26 @@ int main(int argc, char ** argv) {
     int initSParameter = atoi(argv[3]);
     int calculationsNum = atoi(argv[4]);
 
-    struct Data data;
+    FILE *fp;
+    int dimension;
+
     if (rank == 0) {
-        data = loadDataFromFile(inputDataPath);
+        fp = fopen(inputDataPath, "r");
+        if (fp == NULL) {
+            exit(EXIT_FAILURE);
+        }
+
+        dimension = numberOfLines(fp);
     }
-    else {
-        data.matrix = NULL;
-        data.bVector = NULL;
-        data.dimension = 0;
+
+    MPI_Bcast(&dimension, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    struct Data data = allocateData(dimension);
+    data.dimension = dimension;
+
+    if (rank == 0) {
+        parseData(fp, &data);
+        fclose(fp);
     }
 
     int iterations;
@@ -57,9 +69,7 @@ int main(int argc, char ** argv) {
         free(result);
     }
 
-    if (rank == 0) {
-        deallocateData(data);
-    }
+    deallocateData(&data);
 
     MPI_Finalize();
 

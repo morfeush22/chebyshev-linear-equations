@@ -18,19 +18,19 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
     double beta = 2.0 * findMaxElementInMatrix(matrix, dimension, rank, size);
 
     double * xIVector, * xZeroVector, * xPrevVector, * t1Vector, * t2Vector;
-    xIVector = xZeroVector = xPrevVector = t1Vector = t2Vector = NULL;
 
     double omegaZero, c, L;
 
+    xIVector = malloc(dimension * sizeof(double));
+    xZeroVector = malloc(dimension * sizeof(double));
+    xPrevVector = malloc(dimension * sizeof(double));
+
+    t1Vector = malloc(dimension * sizeof(double));
+    t2Vector = malloc(dimension * sizeof(double));
+
     if (rank == 0) {
-        xIVector = malloc(dimension * sizeof(double));
-        xZeroVector = malloc(dimension * sizeof(double));
-        xPrevVector = malloc(dimension * sizeof(double));
         zeroVector(xIVector, dimension);
         zeroVector(xZeroVector, dimension);
-
-        t1Vector = malloc(dimension * sizeof(double));
-        t2Vector = malloc(dimension * sizeof(double));
 
         omegaZero = (beta - alfa) / (beta + alfa);
         c = 2.0 / (beta + alfa);
@@ -96,10 +96,5 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
     free(t1Vector);
     free(t2Vector);
 
-    if (rank == 0) {
-        return xIVector;
-    }
-    else {
-        return NULL;
-    }
+    return xIVector;
 }

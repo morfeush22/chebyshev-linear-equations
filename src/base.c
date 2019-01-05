@@ -5,49 +5,28 @@
 #include "base.h"
 #include "stdlib.h"
 
-struct Data loadDataFromFile(const char * path) {
-    FILE * fp;
-
-    fp = fopen(path, "r");
-    if (fp == NULL) {
-        exit(EXIT_FAILURE);
-    }
-
-    int dimension = numberOfLines(fp);
-
-    struct Data data = parseData(fp, dimension);
-
-    fclose(fp);
-
-    return data;
-}
-
-void deallocateData(struct Data data) {
-    double * memBlock = data.matrix[0];
+void deallocateData(struct Data * data) {
+    double * memBlock = data->matrix[0];
 
     free(memBlock);
-    free(data.matrix);
-    free(data.bVector);
+    free(data->matrix);
+    free(data->bVector);
 }
 
-void printData(struct Data data) {
+void printData(struct Data * data) {
     int i, j;
 
-    for (i = 0; i < data.dimension; ++i) {
-        for (j = 0 ; j < data.dimension; ++j) {
-            printf("%.6f ", data.matrix[i][j]);
+    for (i = 0; i < data->dimension; ++i) {
+        for (j = 0 ; j < data->dimension; ++j) {
+            printf("%.6f ", data->matrix[i][j]);
         }
 
-        printf("%.6f\n", data.bVector[i]);
+        printf("%.6f\n", data->bVector[i]);
     }
 }
 
-struct Data parseData(FILE * fp, int dimension) {
-    struct Data data = allocateData(dimension);
-
+void parseData(FILE * fp, struct Data * data) {
     readData(fp, data);
-
-    return data;
 }
 
 struct Data allocateData(int dimension) {
@@ -68,18 +47,18 @@ struct Data allocateData(int dimension) {
     return data;
 }
 
-void readData(FILE * fp, struct Data data) {
+void readData(FILE * fp, struct Data * data) {
     int i, j;
     double var;
 
-    for (i = 0; i < data.dimension; ++i) {
-        for (j = 0 ; j < data.dimension; ++j) {
+    for (i = 0; i < data->dimension; ++i) {
+        for (j = 0 ; j < data->dimension; ++j) {
             fscanf(fp, "%lf", &var);
-            data.matrix[i][j] = var;
+            data->matrix[i][j] = var;
         }
 
         fscanf(fp,"%lf", &var);
-        data.bVector[i] = var;
+        data->bVector[i] = var;
     }
 }
 
