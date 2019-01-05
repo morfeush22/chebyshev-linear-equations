@@ -45,7 +45,8 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
     while (true) {
         int k = 0;
 
-        assignVector(xIVector, xZeroVector, dimension);
+        if (rank == 0)
+            assignVector(xIVector, xZeroVector, dimension);
 
         double omegaPrev, omegaI;
 
@@ -73,7 +74,8 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
             }
         }
 
-        assignVector(xZeroVector, xIVector, dimension);
+        if (rank == 0)
+            assignVector(xZeroVector, xIVector, dimension);
 
         // calculate error
         multiplyMatrixByVector(matrix, xZeroVector, t1Vector, dimension, rank, size);

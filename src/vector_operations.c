@@ -95,8 +95,8 @@ double findAbsMaxElementInVector(const double * vector, int size, int rank, int 
     }
 }
 
-void multiplyMatrixByVector(const double * const * matrix, double * vector, double * sink, int dimension,
-        int rank, int procNum) {
+void multiplyMatrixByVector(const double * const * matrix, double * vector, double * sink, int dimension, int rank,
+        int procNum) {
     size_t mallocSize = getChunkSize(dimension, procNum) * sizeof(double);
     double * localMatrix = malloc(mallocSize * dimension);
     double * localSink = malloc(mallocSize);
