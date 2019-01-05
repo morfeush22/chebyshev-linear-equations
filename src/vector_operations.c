@@ -95,19 +95,47 @@ double findAbsMaxElementInVector(const double * vector, int size, int rank, int 
     }
 }
 
-void multiplyMatrixByVector(const double * const * matrix, const double * vector, double * sink, int dimension,
+void multiplyMatrixByVector(const double * const * matrix, double * vector, double * sink, int dimension,
         int rank, int procNum) {
-    if (rank == 0) {
-        for (int i = 0; i < dimension; ++i) {
-            double sum = 0;
+    size_t mallocSize = getChunkSize(dimension, procNum) * sizeof(double);
+    double * localMatrix = malloc(mallocSize * dimension);
+    double * localSink = malloc(mallocSize);
 
-            for (int j = 0; j < dimension; ++j) {
-                sum += matrix[i][j] * vector[j];
-            }
+    int * counts = getCounts(dimension, procNum);
+    int * displacements = getDisplacements(counts, procNum);
 
-            sink[i] = sum;
-        }
+    int * matrixCounts = malloc(procNum * sizeof(int));
+    int * matrixDisplacements = malloc(procNum * sizeof(int));
+
+    for (int i = 0; i < procNum; ++i) {
+        matrixCounts[i] = counts[i] * dimension;
+        matrixDisplacements[i] = displacements[i] * dimension;
     }
+
+    MPI_Bcast(vector, dimension, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Scatterv(*matrix, matrixCounts, matrixDisplacements, MPI_DOUBLE, localMatrix, matrixCounts[rank], MPI_DOUBLE, 0,
+            MPI_COMM_WORLD);
+
+    for (int i = 0; i < counts[rank]; ++i) {
+        double sum = 0;
+
+        for (int j = 0; j < dimension; ++j) {
+            sum += *(localMatrix + i * dimension + j) * vector[j];
+        }
+
+        localSink[i] = sum;
+    }
+
+    MPI_Gatherv(localSink, counts[rank], MPI_DOUBLE, sink, counts, displacements, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    free(localMatrix);
+    free(localSink);
+
+    free(counts);
+    free(displacements);
+
+    free(matrixCounts);
+    free(matrixDisplacements);
 }
 
 void multiplyVectorByScalar(const double * vector, double scalar, double * sink, int size, int rank, int procNum) {
