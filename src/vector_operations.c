@@ -6,7 +6,36 @@
 #include "math.h"
 #include "mpi.h"
 #include "stdio.h"
+#include "stdlib.h"
 #include "string.h"
+
+int getChunkSize(int size, int procNum) {
+    return size % procNum ? size / procNum + 1 : size / procNum;
+}
+
+int * getCounts(int size, int procNum) {
+    int * counts = malloc(procNum * sizeof(int));
+
+    for (int i = 0; i < procNum; ++i) {
+        counts[i] = getChunkSize(size, procNum - i);
+        size -= counts[i];
+    }
+
+    return counts;
+}
+
+int * getDisplacements(const int * counts, int procNum) {
+    int * displacements = malloc(procNum * sizeof(int));
+
+    int cum = 0;
+
+    for (int i = 0; i < procNum; ++i) {
+        displacements[i] = cum;
+        cum += counts[i];
+    }
+
+    return displacements;
+}
 
 void addVectors(const double * vector1, const double * vector2, double * sink, int size, int rank, int procNum) {
     for (int i = 0; i < size; ++i) {
@@ -68,9 +97,31 @@ void printVector(double * vector, int size) {
 }
 
 void subtractVectors(const double * from, const double * vector, double * sink, int size, int rank, int procNum) {
-    for (int i = 0; i < size; ++i) {
-        sink[i] = from[i] - vector[i];
+    MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    size_t mallocSize = getChunkSize(size, procNum) * sizeof(double);
+    double * localFrom = malloc(mallocSize);
+    double * localVector = malloc(mallocSize);
+    double * localSink = malloc(mallocSize);
+
+    int * counts = getCounts(size, procNum);
+    int * displacements = getDisplacements(counts, procNum);
+
+    MPI_Scatterv(from, counts, displacements, MPI_DOUBLE, localFrom, counts[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Scatterv(vector, counts, displacements, MPI_DOUBLE, localVector, counts[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    for (int i = 0; i < counts[rank]; ++i) {
+        localSink[i] = localFrom[i] - localVector[i];
     }
+
+    MPI_Gatherv(localSink, counts[rank], MPI_DOUBLE, sink, counts, displacements, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    free(localFrom);
+    free(localVector);
+    free(localSink);
+
+    free(counts);
+    free(displacements);
 }
 
 void zeroVector(double * vector, int size) {
