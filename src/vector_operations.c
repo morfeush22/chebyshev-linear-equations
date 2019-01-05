@@ -111,11 +111,27 @@ void multiplyMatrixByVector(const double * const * matrix, const double * vector
 }
 
 void multiplyVectorByScalar(const double * vector, double scalar, double * sink, int size, int rank, int procNum) {
-    if (rank == 0) {
-        for (int i = 0; i < size; ++i) {
-            sink[i] = vector[i] * scalar;
-        }
+    size_t mallocSize = getChunkSize(size, procNum) * sizeof(double);
+    double * localVector = malloc(mallocSize);
+    double * localSink = malloc(mallocSize);
+
+    int * counts = getCounts(size, procNum);
+    int * displacements = getDisplacements(counts, procNum);
+
+    MPI_Bcast(&scalar, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Scatterv(vector, counts, displacements, MPI_DOUBLE, localVector, counts[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    for (int i = 0; i < counts[rank]; ++i) {
+        localSink[i] = localVector[i] * scalar;
     }
+
+    MPI_Gatherv(localSink, counts[rank], MPI_DOUBLE, sink, counts, displacements, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    free(localVector);
+    free(localSink);
+
+    free(counts);
+    free(displacements);
 }
 
 void printVector(double * vector, int size) {
