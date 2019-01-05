@@ -38,11 +38,29 @@ int * getDisplacements(const int * counts, int procNum) {
 }
 
 void addVectors(const double * vector1, const double * vector2, double * sink, int size, int rank, int procNum) {
-    if (rank == 0) {
-        for (int i = 0; i < size; ++i) {
-            sink[i] = vector1[i] + vector2[i];
-        }
+    size_t mallocSize = getChunkSize(size, procNum) * sizeof(double);
+    double * localVec1 = malloc(mallocSize);
+    double * localVec2 = malloc(mallocSize);
+    double * localSink = malloc(mallocSize);
+
+    int * counts = getCounts(size, procNum);
+    int * displacements = getDisplacements(counts, procNum);
+
+    MPI_Scatterv(vector1, counts, displacements, MPI_DOUBLE, localVec1, counts[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Scatterv(vector2, counts, displacements, MPI_DOUBLE, localVec2, counts[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    for (int i = 0; i < counts[rank]; ++i) {
+        localSink[i] = localVec1[i] + localVec2[i];
     }
+
+    MPI_Gatherv(localSink, counts[rank], MPI_DOUBLE, sink, counts, displacements, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    free(localVec1);
+    free(localVec2);
+    free(localSink);
+
+    free(counts);
+    free(displacements);
 }
 
 void assignVector(double * to, const double * from, int size) {
@@ -107,8 +125,6 @@ void printVector(double * vector, int size) {
 }
 
 void subtractVectors(const double * from, const double * vector, double * sink, int size, int rank, int procNum) {
-    MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
     size_t mallocSize = getChunkSize(size, procNum) * sizeof(double);
     double * localFrom = malloc(mallocSize);
     double * localVector = malloc(mallocSize);
