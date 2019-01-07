@@ -28,6 +28,7 @@ int main(int argc, char ** argv) {
 
     if (rank == 0) {
         fp = fopen(inputDataPath, "r");
+
         if (fp == NULL) {
             exit(EXIT_FAILURE);
         }
@@ -55,7 +56,7 @@ int main(int argc, char ** argv) {
             clock_gettime(CLOCK_MONOTONIC_RAW, &start);
         }
 
-        double *result = solveLinear(data, precision, sParameter, &iterations, rank, size);
+        double * result = solveLinear(&data, precision, sParameter, &iterations, rank, size);
 
         if (rank == 0) {
             clock_gettime(CLOCK_MONOTONIC_RAW, &stop);

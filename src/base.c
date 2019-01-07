@@ -6,7 +6,7 @@
 #include "stdlib.h"
 
 void deallocateData(struct Data * data) {
-    double * memBlock = data->matrix[0];
+    double * memBlock = *data->matrix;
 
     free(memBlock);
     free(data->matrix);
@@ -14,10 +14,8 @@ void deallocateData(struct Data * data) {
 }
 
 void printData(struct Data * data) {
-    int i, j;
-
-    for (i = 0; i < data->dimension; ++i) {
-        for (j = 0 ; j < data->dimension; ++j) {
+    for (int i = 0; i < data->dimension; ++i) {
+        for (int j = 0 ; j < data->dimension; ++j) {
             printf("%.6f ", data->matrix[i][j]);
         }
 
@@ -48,11 +46,10 @@ struct Data allocateData(int dimension) {
 }
 
 void readData(FILE * fp, struct Data * data) {
-    int i, j;
     double var;
 
-    for (i = 0; i < data->dimension; ++i) {
-        for (j = 0 ; j < data->dimension; ++j) {
+    for (int i = 0; i < data->dimension; ++i) {
+        for (int j = 0 ; j < data->dimension; ++j) {
             fscanf(fp, "%lf", &var);
             data->matrix[i][j] = var;
         }

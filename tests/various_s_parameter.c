@@ -19,6 +19,7 @@ void testDifferentSParameter() {
 
     if (rank == 0) {
         fp = fopen("sources/data", "r");
+
         if (fp == NULL) {
             exit(EXIT_FAILURE);
         }
@@ -45,7 +46,7 @@ void testDifferentSParameter() {
     }
 
     for (int sParameter = 1; sParameter < 100; ++sParameter) {
-        double *result = solveLinear(data, PRECISION, sParameter, &iterations, rank, size);
+        double *result = solveLinear(&data, PRECISION, sParameter, &iterations, rank, size);
 
         if (rank == 0) {
             for (int i = 0; i < dimension; ++i) {

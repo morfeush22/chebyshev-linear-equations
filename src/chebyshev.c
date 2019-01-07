@@ -37,12 +37,13 @@ int * getDisplacements(const int * counts, int procNum) {
     return displacements;
 }
 
-double * solveLinear(const struct Data data, double precision, int sParameter, int * iterations, int rank, int size) {
-    double * matrix = *data.matrix;
-    double * bVector = data.bVector;
-    int dimension = data.dimension;
+double * solveLinear(const struct Data * data, double precision, int sParameter, int * iterations, int rank, int size) {
+    double * matrix = *data->matrix;
+    double * bVector = data->bVector;
+    int dimension = data->dimension;
 
     int chunkSize = getChunkSize(dimension, size);
+
     double * localMatrix = malloc(chunkSize * dimension * sizeof(double));
     double * localBVector = malloc(chunkSize * sizeof(double));
 
@@ -57,38 +58,34 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
         matrixDisplacements[i] = displacements[i] * dimension;
     }
 
-    double * xIVector, * xZeroVector, * xPrevVector, * t1Vector, * t2Vector, * t3Vector;
-
-    xIVector = malloc(dimension * sizeof(double));
-    xZeroVector = malloc(dimension * sizeof(double));
-    xPrevVector = malloc(dimension * sizeof(double));
-
-    t1Vector = malloc(dimension * sizeof(double));
-    t2Vector = malloc(dimension * sizeof(double));
-    t3Vector = malloc(dimension * sizeof(double));
-
     MPI_Scatterv(matrix, matrixCounts, matrixDisplacements, MPI_DOUBLE, localMatrix, matrixCounts[rank], MPI_DOUBLE, 0,
                  MPI_COMM_WORLD);
     MPI_Scatterv(bVector, counts, displacements, MPI_DOUBLE, localBVector, counts[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    double * xIVector = malloc(dimension * sizeof(double));
+    double * xZeroVector = malloc(dimension * sizeof(double));
+
+    zeroVector(xIVector, dimension);
+    zeroVector(xZeroVector, dimension);
+
+    double * localXIVector = malloc(chunkSize * sizeof(double));
+    double * xPrevVector = malloc(chunkSize * sizeof(double));
+    double * t1Vector = malloc(chunkSize * sizeof(double));
+    double * t2Vector = malloc(chunkSize * sizeof(double));
+
+    zeroVector(xPrevVector, chunkSize);
 
     double globalMaxMatrixElem;
 
     double maxMatrixElem = findMaxElementInMatrix(localMatrix, matrixCounts[rank]);
     MPI_Allreduce(&maxMatrixElem, &globalMaxMatrixElem, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
-    double alfa, beta, omegaZero, c, L;
+    double alfa = 100;
+    double beta = 2.0 * globalMaxMatrixElem;
 
-    alfa = 100;
-    beta = 2.0 * globalMaxMatrixElem;
-
-    zeroVector(xIVector, dimension);
-    zeroVector(xZeroVector, dimension);
-
-    omegaZero = (beta - alfa) / (beta + alfa);
-    c = 2.0 / (beta + alfa);
-    L = 2.0 * (beta + alfa) / (beta - alfa);
-
-    zeroVector(xPrevVector, dimension);
+    double omegaZero = (beta - alfa) / (beta + alfa);
+    double c = 2.0 / (beta + alfa);
+    double L = 2.0 * (beta + alfa) / (beta - alfa);
 
     int fullIterations = 0;
 
@@ -97,30 +94,30 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
 
         assignVector(xIVector, xZeroVector, dimension);
 
-        double omegaPrev, omegaI;
-
-        omegaPrev = 0;
-        omegaI = omegaZero;
+        double omegaPrev = 0;
+        double omegaI = omegaZero;
 
         for (; k < sParameter; ++k) {
             multiplyMatrixByVector(localMatrix, xIVector, t1Vector, matrixCounts[rank], dimension);
             subtractVectors(t1Vector, localBVector, t1Vector, counts[rank]);
             multiplyVectorByScalar(t1Vector, c * (1 + omegaI * omegaPrev), t1Vector, counts[rank]);
 
-            MPI_Scatterv(xIVector, counts, displacements, MPI_DOUBLE, t3Vector, counts[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+            MPI_Scatterv(xIVector, counts, displacements, MPI_DOUBLE, localXIVector, counts[rank], MPI_DOUBLE, 0,
+                    MPI_COMM_WORLD);
 
-            subtractVectors(t3Vector, xPrevVector, t2Vector, counts[rank]);
+            subtractVectors(localXIVector, xPrevVector, t2Vector, counts[rank]);
             multiplyVectorByScalar(t2Vector, omegaI * omegaPrev, t2Vector, counts[rank]);
 
-            addVectors(t3Vector, t2Vector, t2Vector, counts[rank]);
+            addVectors(localXIVector, t2Vector, t2Vector, counts[rank]);
 
-            assignVector(xPrevVector, t3Vector, counts[rank]);
-            subtractVectors(t2Vector, t1Vector, t3Vector, counts[rank]);
+            assignVector(xPrevVector, localXIVector, counts[rank]);
+            subtractVectors(t2Vector, t1Vector, localXIVector, counts[rank]);
 
             omegaPrev = omegaI;
             omegaI = 1.0 / (L - omegaI);
 
-            MPI_Allgatherv(t3Vector, counts[rank], MPI_DOUBLE, xIVector, counts, displacements, MPI_DOUBLE, MPI_COMM_WORLD);
+            MPI_Allgatherv(localXIVector, counts[rank], MPI_DOUBLE, xIVector, counts, displacements, MPI_DOUBLE,
+                    MPI_COMM_WORLD);
         }
 
         assignVector(xZeroVector, xIVector, dimension);
@@ -142,9 +139,19 @@ double * solveLinear(const struct Data data, double precision, int sParameter, i
         ++fullIterations;
     }
 
-    free(xZeroVector);
-    free(xPrevVector);
+    free(localMatrix);
+    free(localBVector);
 
+    free(counts);
+    free(displacements);
+
+    free(matrixCounts);
+    free(matrixDisplacements);
+
+    free(xZeroVector);
+
+    free(localXIVector);
+    free(xPrevVector);
     free(t1Vector);
     free(t2Vector);
 

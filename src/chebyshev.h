@@ -4,4 +4,4 @@
 
 #include "base.h"
 
-double * solveLinear(struct Data data, double precision, int sParameter, int * iterations, int rank, int size);
+double * solveLinear(const struct Data * data, double precision, int sParameter, int * iterations, int rank, int size);

@@ -19,6 +19,7 @@ void basicTest() {
 
     if (rank == 0) {
         fp = fopen("sources/data", "r");
+
         if (fp == NULL) {
             exit(EXIT_FAILURE);
         }
@@ -41,7 +42,7 @@ void basicTest() {
 
     double * result;
 
-    result = solveLinear(data, PRECISION, sParameter, &iterations, rank, size);
+    result = solveLinear(&data, PRECISION, sParameter, &iterations, rank, size);
 
     if (rank == 0) {
         double * expectedResult = loadVectorFromFile("sources/data.expected_solution");
